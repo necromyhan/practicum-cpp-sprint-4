@@ -1,4 +1,5 @@
 #include "metric_impl/parameters_count.hpp"
+#include "utils.hpp"
 
 #include <array>
 #include <cstdio>

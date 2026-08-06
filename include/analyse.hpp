@@ -40,11 +40,13 @@ namespace rs = std::ranges;
  */
 auto AnalyseFunctions(const std::vector<std::string> &files,
                       const analyzer::metric::MetricExtractor &metric_extractor) {
-    // здесь ваш код
+    using AnalysisResult = std::vector<std::pair<function::Function, metric::MetricResults>>;
+    AnalysisResult analysis;
+    return analysis;
 }
 
 /**
- * 
+ *
  * @brief Группирует результаты анализа по классам.
  *
  * Эта функция:
@@ -62,7 +64,17 @@ auto AnalyseFunctions(const std::vector<std::string> &files,
  * действительно исчезают из результата.
  */
 auto SplitByClasses(const auto &analysis) {
-    // здесь ваш код
+    return analysis
+           // Шаг 1: Оставляем только методы классов (у которых class_name не пустой)
+           | std::views::filter([](const auto &elem) {
+                 // elem — это std::pair<Function, MetricResults>
+                 return elem.first.class_name.has_value();
+             })
+           // Шаг 2: Разбиваем на группы по имени класса
+           | std::views::chunk_by([](const auto &a, const auto &b) {
+                 // Сравниваем имена классов соседних элементов
+                 return a.first.class_name.value() == b.first.class_name.value();
+             });
 }
 
 /**
@@ -74,7 +86,8 @@ auto SplitByClasses(const auto &analysis) {
  * - Использует `chunk_by`, поэтому **порядок функций в `analysis` должен быть по файлам**.
  */
 auto SplitByFiles(const auto &analysis) {
-    // здесь ваш код
+    return analysis |
+           std::views::chunk_by([](const auto &a, const auto &b) { return a.first.filename == b.first.filename; });
 }
 
 /**
