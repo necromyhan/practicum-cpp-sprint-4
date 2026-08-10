@@ -72,16 +72,16 @@ FunctionExtractor::FunctionNameLocation FunctionExtractor::GetNameLocation(const
     std::string coords = function_ast.substr(coord_start + 1, coord_end - coord_start - 1);
 
     size_t comma = coords.find(',');
-    Position start{static_cast<size_t>(ToInt(coords.substr(0, comma))),
-                   static_cast<size_t>(ToInt(coords.substr(comma + 2)))};
+    Position start{static_cast<size_t>(std::stoi(coords.substr(0, comma))),
+                   static_cast<size_t>(std::stoi(coords.substr(comma + 2)))};
 
     size_t dash = function_ast.find('[', coord_end);
     size_t end_bracket = function_ast.find(']', dash);
     std::string end_coords = function_ast.substr(dash + 1, end_bracket - dash - 1);
 
     comma = end_coords.find(',');
-    Position end{static_cast<size_t>(ToInt(end_coords.substr(0, comma))),
-                 static_cast<size_t>(ToInt(end_coords.substr(comma + 2)))};
+    Position end{static_cast<size_t>(std::stoi(end_coords.substr(0, comma))),
+                 static_cast<size_t>(std::stoi(end_coords.substr(comma + 2)))};
 
     return {start, end, ""};
 }
@@ -111,8 +111,8 @@ FunctionExtractor::FindEnclosingClass(const std::string &ast, const FunctionName
         std::string coords = ast.substr(coord_start + 1, coord_end - coord_start - 1);
 
         size_t comma = coords.find(',');
-        Position class_start{static_cast<size_t>(ToInt(coords.substr(0, comma))),
-                             static_cast<size_t>(ToInt(coords.substr(comma + 1)))};
+        Position class_start{static_cast<size_t>(std::stoi(coords.substr(0, comma))),
+                             static_cast<size_t>(std::stoi(coords.substr(comma + 1)))};
 
         size_t dash = ast.find('-', coord_end);
         size_t second_coord_start = ast.find('[', dash);
@@ -120,8 +120,8 @@ FunctionExtractor::FindEnclosingClass(const std::string &ast, const FunctionName
         std::string end_coords = ast.substr(second_coord_start + 1, second_coord_end - second_coord_start - 1);
 
         comma = end_coords.find(',');
-        Position class_end{static_cast<size_t>(ToInt(end_coords.substr(0, comma))),
-                           static_cast<size_t>(ToInt(end_coords.substr(comma + 1)))};
+        Position class_end{static_cast<size_t>(std::stoi(end_coords.substr(0, comma))),
+                           static_cast<size_t>(std::stoi(end_coords.substr(comma + 1)))};
 
         if (func_loc.start.line > class_start.line ||
             (func_loc.start.line == class_start.line && func_loc.start.col >= class_start.col)) {
