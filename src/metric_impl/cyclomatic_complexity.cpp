@@ -72,7 +72,7 @@ MetricResult::ValueType CyclomaticComplexityMetric::CalculateImpl(const function
         size_t pos = 0;
         while ((pos = ast.find(node, pos)) != std::string::npos) {
             complexity++;
-            pos += node.length();  // Сдвигаемся на длину найденного узла, чтобы идти дальше
+            pos += node.length();
         }
     }
 
