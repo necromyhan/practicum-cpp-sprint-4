@@ -40,11 +40,29 @@ namespace rs = std::ranges;
  */
 auto AnalyseFunctions(const std::vector<std::string> &files,
                       const analyzer::metric::MetricExtractor &metric_extractor) {
-    // здесь ваш код
+    using AnalysisResult = std::vector<std::pair<function::Function, metric::MetricResults>>;
+
+    function::FunctionExtractor func_extractor;
+
+    auto get_functions_from_file = [&](const std::string &filename) -> std::vector<function::Function> {
+        try {
+            file::File file(filename);
+            return func_extractor.Get(file);
+        } catch (const std::exception &e) {
+            std::cerr << "Error processing " << filename << ": " << e.what() << "\n";
+            return {};
+        }
+    };
+
+    return files | std::views::transform(get_functions_from_file) | std::views::join |
+           std::views::transform([&metric_extractor](auto &func) {
+               return std::make_pair(std::move(func), metric_extractor.Get(func));
+           }) |
+           std::ranges::to<AnalysisResult>();
 }
 
 /**
- * 
+ *
  * @brief Группирует результаты анализа по классам.
  *
  * Эта функция:
@@ -62,7 +80,9 @@ auto AnalyseFunctions(const std::vector<std::string> &files,
  * действительно исчезают из результата.
  */
 auto SplitByClasses(const auto &analysis) {
-    // здесь ваш код
+    return analysis | std::views::filter([](const auto &elem) { return elem.first.class_name.has_value(); }) |
+           std::views::chunk_by(
+               [](const auto &a, const auto &b) { return a.first.class_name.value() == b.first.class_name.value(); });
 }
 
 /**
@@ -74,7 +94,8 @@ auto SplitByClasses(const auto &analysis) {
  * - Использует `chunk_by`, поэтому **порядок функций в `analysis` должен быть по файлам**.
  */
 auto SplitByFiles(const auto &analysis) {
-    // здесь ваш код
+    return analysis |
+           std::views::chunk_by([](const auto &a, const auto &b) { return a.first.filename == b.first.filename; });
 }
 
 /**
@@ -87,7 +108,8 @@ auto SplitByFiles(const auto &analysis) {
  */
 void AccumulateFunctionAnalysis(const auto &analysis,
                                 const analyzer::metric_accumulator::MetricsAccumulator &accumulator) {
-    // здесь ваш код
+    std::for_each(analysis.begin(), analysis.end(),
+                  [&](const auto &elem) { accumulator.AccumulateNextFunctionResults(elem.second); });
 }
 
 }  // namespace analyzer

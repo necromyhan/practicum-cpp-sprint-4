@@ -15,6 +15,10 @@ target_link_libraries(${target}
         file
 )
 
+target_compile_definitions(${target} PRIVATE
+    TEST_FILES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/tests/files"
+)
+
 file(GLOB test_files "${CMAKE_CURRENT_SOURCE_DIR}/tests/files/*.py")
 foreach(file IN LISTS test_files)
     get_filename_component(file_name ${file} NAME)
