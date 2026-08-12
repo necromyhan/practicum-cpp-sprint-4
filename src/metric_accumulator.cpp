@@ -32,9 +32,11 @@ namespace analyzer::metric_accumulator {
  */
 void MetricsAccumulator::AccumulateNextFunctionResults(const std::vector<metric::MetricResult> &metric_results) const {
     std::ranges::for_each(metric_results, [this](const auto &metric_result) {
-        if (auto it = accumulators.find(metric_result.metric_name); it != accumulators.end()) {
-            it->second->Accumulate(metric_result);
+        auto it = accumulators.find(metric_result.metric_name);
+        if (it == accumulators.end()) {
+            throw std::runtime_error("No accumulator registered for metric: " + metric_result.metric_name);
         }
+        it->second->Accumulate(metric_result);
     });
 }
 /**

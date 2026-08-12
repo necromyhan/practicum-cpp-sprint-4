@@ -32,11 +32,10 @@ TEST_P(CodeLinesCountMetricTest, CountsCorrectNumberOfLines) {
 
     ASSERT_FALSE(functions.empty()) << "No functions found in " << param.filename;
 
-    int total_lines = 0;
-    for (const auto &func : functions) {
+    int total_lines = std::ranges::fold_left(functions, 0, [&](int sum, const auto &func) {
         auto result = metric_.Calculate(func);
-        total_lines += std::get<int>(result.value);
-    }
+        return sum + std::get<int>(result.value);
+    });
 
     EXPECT_EQ(total_lines, param.expected_total_lines);
 }

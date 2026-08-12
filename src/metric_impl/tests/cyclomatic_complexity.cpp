@@ -33,11 +33,10 @@ TEST_P(CyclomaticComplexityMetricTest, CalculatesCorrectComplexity) {
 
     ASSERT_FALSE(functions.empty()) << "No functions found in " << param.filename;
 
-    int total_complexity = 0;
-    for (const auto &func : functions) {
+    int total_complexity = std::ranges::fold_left(functions, 0, [&](int sum, const auto &func) {
         auto result = metric_.Calculate(func);
-        total_complexity += std::get<int>(result.value);
-    }
+        return sum + std::get<int>(result.value);
+    });
 
     EXPECT_EQ(total_complexity, param.expected_complexity);
 }

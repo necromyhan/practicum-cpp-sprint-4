@@ -33,11 +33,8 @@ TEST_P(ParametersCountMetricTest, CalculatesCorrectParametersCount) {
 
     ASSERT_FALSE(functions.empty()) << "No functions found in " << param.filename;
 
-    int total_parameters = 0;
-    for (const auto &func : functions) {
-        auto result = metric_.Calculate(func);
-        total_parameters += std::get<int>(result.value);
-    }
+    int total_parameters = std::ranges::fold_left(
+        functions, 0, [&](int sum, const auto &func) { return sum + std::get<int>(metric_.Calculate(func).value); });
 
     EXPECT_EQ(total_parameters, param.expected_parameters_count);
 }

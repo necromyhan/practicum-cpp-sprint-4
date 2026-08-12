@@ -33,9 +33,7 @@ MetricResults MetricExtractor::Get(const function::Function &func) const {
     MetricResults results;
     results.reserve(metrics.size());
 
-    for (const auto &metric : metrics) {
-        results.push_back(metric->Calculate(func));
-    }
+    std::ranges::for_each(metrics, [&](const auto &metric) { results.push_back(metric->Calculate(func)); });
 
     return results;
 }
